@@ -153,15 +153,17 @@ final class ArticleRepository
         );
     }
 
-    /**
-     * Estimated reading time in whole minutes (200 words/minute, minimum 1).
-     */
-    private function readingTime(string $markdown): int
-    {
-        $words = str_word_count(strip_tags($markdown));
+   /**
+ * Estimated reading time in whole minutes, rounding any partial minute
+ * up to a full minute (minimum 1).
+ */
+private function readingTime(string $markdown): int
+{
+    $words = str_word_count(strip_tags($markdown));
 
-        return max(1, (int) ceil($words / 200));
-    }
+    // Round up so a partial minute still counts as a full minute.
+    return max(1, intdiv($words, self::WORDS_PER_MINUTE) + 1);
+}
 
     private function converter(): MarkdownConverter
     {
